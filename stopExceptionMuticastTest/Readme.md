@@ -1,4 +1,4 @@
-**An example test case showing how the stopOnException() camel processor behaves with the multicast() processor alongwith the parallelProcessing() **
+**An example test case showing how the stopOnException() camel processor behaves with the multicast() processor alongwith the parallelProcessing()**
 
 - We normally make use of the `stopOnException()` with the `multicast()` processor for the reasons that if any of the endpoint recepients fail, the route flow should be rolled back and the subsequent processors stop executing.
 
