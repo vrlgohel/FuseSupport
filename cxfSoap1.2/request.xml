@@ -1,0 +1,9 @@
+<soap:Envelope xmlns:soap="http://www.w3.org/2003/05/soap-envelope" xmlns:red="http://redhat.com/">
+   <soap:Header/>
+   <soap:Body>
+      <red:sayHi>
+         <!--Optional:-->
+         <arg0>Viral</arg0>
+      </red:sayHi>
+   </soap:Body>
+</soap:Envelope>
