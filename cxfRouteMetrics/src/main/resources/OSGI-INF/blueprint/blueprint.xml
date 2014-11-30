@@ -40,7 +40,6 @@
 	<camelContext trace="true" xmlns="http://camel.apache.org/schema/blueprint">
     <route streamCache="true">
         <from uri="cxf:bean:serviceEndpoint?synchronous=true"/>
-        <!-- <convertBodyTo type="java.lang.String"/>-->                    
         <to uri="bean:messageDump"/>
     </route>
 </camelContext>

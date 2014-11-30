@@ -44,8 +44,15 @@
                 <configuration>
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-                        <Export-Package>com.redhat.*</Export-Package>
                     </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.camel</groupId>
+                <artifactId>camel-maven-plugin</artifactId>
+                <version>2.12.0</version>
+                <configuration>
+                    <fileApplicationContextUri>src/main/resources/META-INF/spring/spring-config.xml</fileApplicationContextUri>
                 </configuration>
             </plugin>
         </plugins>
