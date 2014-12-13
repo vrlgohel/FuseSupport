@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:cxf="http://camel.apache.org/schema/cxf"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+       <bean id="realWebService" class="com.redhat.TriggerRealService" init-method="start" destroy-method="stop">
+              <property name="url" value="http://localhost:9090/Greeter"/>
+       </bean>
+       <cxf:cxfEndpoint id="proxyService" serviceClass="com.redhat.Greeter"
+                        address="http://localhost:9080/proxyService/Greeter" loggingFeatureEnabled="true"/>
+       <camelContext xmlns="http://camel.apache.org/schema/spring">
+             <endpoint id="callRealWebService" uri="http://localhost:9090/Greeter"/>
+              <route id="proxyRoute">
+                     <from uri="cxf:bean:proxyService?dataFormat=MESSAGE"/>
+                     <convertBodyTo type="java.lang.String"/>
+                     <log message="Soap Message from Proxy Service received, ${body} \n operationName : ${in.header.SOAPAction}"/>
+                     <to ref="callRealWebService"/>
+              </route>
+       </camelContext>
+</beans>
