@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:camel="http://camel.apache.org/schema/blueprint"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+           xsi:schemaLocation="
+       http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+       http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+
+    <bean id="dataSource" class="com.mysql.jdbc.jdbc2.optional.MysqlDataSource">
+        <property name="url" value="jdbc:mysql://localhost:3306/quartz"/>
+        <property name="user" value="root"/>
+    </bean>
+   
+    <service interface="javax.sql.DataSource" ref="dataSource">
+        <service-properties>
+            <entry key="osgi.jndi.service.name" value="jdbc/mysql"/>
+        </service-properties>
+    </service>
+
+    <!--<bean id="stdSchedulerFactory" class="org.quartz.impl.StdSchedulerFactory">
+        <argument  type="java.util.Properties">
+            <props>
+                <prop key="org.quartz.jobStore.class">org.quartz.impl.jdbcjobstore.JobStoreTX</prop>
+                <prop key="org.quartz.dataSource.mysqlDS.jndiURL">osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/mysql)</prop>
+                <prop key="org.quartz.jobStore.dataSource">mysqlDS</prop>
+                <prop key="org.quartz.scheduler.instanceId">AUTO</prop>
+                <prop key="org.quartz.jobStore.misfireThreshold">60000</prop>
+                <prop key="org.quartz.jobStore.class">org.quartz.impl.jdbcjobstore.JobStoreTX</prop>
+                <prop key="org.quartz.jobStore.driverDelegateClass">org.quartz.impl.jdbcjobstore.StdJDBCDelegate</prop>
+                <prop key="org.quartz.scheduler.skipUpdateCheck">true</prop>
+                <prop key="org.quartz.jobStore.isClustered">true</prop>
+                <prop key="org.quartz.threadPool.class">org.quartz.simpl.SimpleThreadPool</prop>
+                <prop key="org.quartz.threadPool.threadCount">50</prop>
+                <prop key="org.quartz.plugin.triggHistory.class">org.quartz.plugins.history.LoggingTriggerHistoryPlugin	</prop>
+                <prop key="org.quartz.plugin.triggHistory.triggerFiredMessage">Trigger {1}.{0} fired job {6}.{5} at {4,date,yyyy-MM-dd HH:mm:ss} </prop>
+                <prop key="org.quartz.plugin.triggHistory.triggerCompleteMessage">Trigger {1}.{0} completed firing job {6}.{5} at
+                    {4,date, yyyy-MM-dd HH:mm:ss} with resulting trigger instructioncode {9}
+                </prop>
+            </props>
+        </argument>
+    </bean>-->
+    <camelContext xmlns="http://camel.apache.org/schema/blueprint" id="camelQuartzCluster" autoStartup="true">
+        <route id="clusteredTest">
+            <from uri="quartz://clustergroup/clusterTimerName?job.name=demoQuartzCluster&amp;cron=0/5+*+*+*+*+?"/>
+            <log message="Fired Quartz Triggers ...."/>
+        </route>
+    </camelContext>
+
+    <bean id="quartz" class="org.apache.camel.component.quartz.QuartzComponent">
+        <property name="propertiesFile" value="quartz.properties"/>
+    </bean>
+
+</blueprint>
