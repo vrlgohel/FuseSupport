@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.apache.camel:camel-jasypt:2.12.0.redhat-610379">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/camel/camel-jasypt/2.12.0.redhat-610379/camel-jasypt-2.12.0.redhat-610379.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/camel/camel-jasypt/2.12.0.redhat-610379/camel-jasypt-2.12.0.redhat-610379-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/camel/camel-jasypt/2.12.0.redhat-610379/camel-jasypt-2.12.0.redhat-610379-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
