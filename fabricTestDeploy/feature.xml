@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features name="my-features">
+    <feature name="FileDeploy">
+        <bundle>file:///Viral_Data/Projects_To_Deploy/Fuse/Fabric/fabricTestDeploy/target/fabricTestDeploy-1.0-SNAPSHOT.jar</bundle>
+    </feature>
+</features>

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<features name="my-features">
+    <feature name="TestDeploy">
+        <bundle>mvn:com.redhat/fabricTestDeploy/1.0-SNAPSHOT</bundle>
+    </feature>
+</features>
