@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+       <bean id="jndiTemplate" class="org.springframework.jndi.JndiTemplate">
+              <property name="environment">
+                     <props>
+                            <prop key="java.naming.factory.initial">org.jboss.naming.remote.client.InitialContextFactory
+                            </prop>
+                            <prop key="java.naming.provider.url">remote://localhost:4447</prop>
+                            <prop key="java.naming.factory.url.pkgs">org.jnp.interfaces:org.jboss.naming</prop>
+                     </props>
+              </property>
+       </bean>
+       <bean id="jmsQueueConnectionFactory" class="org.springframework.jndi.JndiObjectFactoryBean">
+              <property name="jndiTemplate">
+                     <ref bean="jndiTemplate" />
+              </property>
+              <property name="jndiName">
+                     <value>jms/RemoteConnectionFactory</value>
+              </property>
+       </bean>
+
+       <bean id="authenticatedConnectionFactory"
+             class="org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter">
+              <property name="targetConnectionFactory" ref="jmsQueueConnectionFactory" />
+              <property name="username" value="Viral" />
+              <property name="password" value="camelExpert12$" />
+       </bean>
+
+       <bean name="jms" class="org.apache.camel.component.jms.JmsComponent">
+              <property name="connectionFactory" ref="authenticatedConnectionFactory"/>
+       </bean>
+
+       <camelContext xmlns="http://camel.apache.org/schema/spring" trace="true">
+              <route>
+                     <from uri="file:./tmp/input"/>
+                     <setHeader headerName="jmsDest">
+                            <simple>${file:name}</simple>
+                     </setHeader>
+                     <recipientList>
+                            <simple>jms:queue:${header.jmsDest}</simple>
+                     </recipientList>
+              </route>
+       </camelContext>
+
+</beans>
