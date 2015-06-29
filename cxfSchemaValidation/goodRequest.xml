@@ -1,0 +1,9 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.samples.redhat.com/">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <ws:hello>
+            <!--Optional:-->
+            <name>FIXED</name>
+        </ws:hello>
+    </soapenv:Body>
+</soapenv:Envelope>

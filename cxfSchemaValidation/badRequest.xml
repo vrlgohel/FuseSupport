@@ -1,0 +1,9 @@
+<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://ws.samples.redhat.com/">
+    <soapenv:Header/>
+    <soapenv:Body>
+        <ws:goodbye>
+            <!--Optional:-->
+            <name>Bla</name>
+        </ws:goodbye>
+    </soapenv:Body>
+</soapenv:Envelope>
