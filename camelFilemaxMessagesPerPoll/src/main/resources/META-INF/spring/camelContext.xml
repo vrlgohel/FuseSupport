@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+  <camelContext trace="false" xmlns="http://camel.apache.org/schema/spring">
+  <route shutdownRoute="Default" shutdownRunningTask="CompleteAllTasks" id="maxFilePolls">
+    <from uri="file:input?maxMessagesPerPoll=2&amp;delay=4000&amp;noop=true&amp;scheduler=spring"/>
+    <process ref="myProcessor"/>
+    <to uri="file:output"/>
+  </route>
+</camelContext>
+
+  <bean id="myProcessor" class="com.redhat.FileReaderProcessor"></bean>
+  <bean id="shutdown"
+  	class="org.apache.camel.impl.DefaultShutdownStrategy">
+  	<property name="timeout" value="20"></property>
+  </bean>
+</beans>
