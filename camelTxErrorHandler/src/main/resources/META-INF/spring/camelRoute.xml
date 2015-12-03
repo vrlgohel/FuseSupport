@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+       <camelContext xmlns="http://camel.apache.org/schema/spring">
+             <!-- <onException>
+                     <exception>java.net.ConnectException</exception>
+                     <redeliveryPolicy maximumRedeliveries="2" redeliveryDelay="0"/>
+              </onException>-->
+              <route errorHandlerRef="transactionErrorHandler">
+                     <from uri="activemq:queue:testQueueIn"/>
+                     <transacted ref="transactionPolicy"/>
+                     <multicast>
+                            <to uri="activemq:queue:testQueueA"/>
+                            <process ref="customProcessor"/>
+                            <bean ref="exceptionBean"/>
+                            <to uri="activemq:queue:testQueueB"/>
+                     </multicast>
+              </route>
+       </camelContext>
+
+       <bean class="org.apache.activemq.ActiveMQConnectionFactory" id="connectionFactory">
+              <property name="brokerURL" value="tcp://localhost:61616"/>
+              <property name="userName" value="admin"/>
+              <property name="password" value="admin"/>
+             <property name="redeliveryPolicy" ref="amqRedeliveryPolicy"/>
+       </bean>
+       <bean class="org.apache.activemq.camel.component.ActiveMQComponent" id="activemq">
+              <property name="connectionFactory" ref="connectionFactory"/>
+              <property name="transacted" value="true"/>
+              <property name="transactionManager" ref="jmsTransactionManager"/>
+       </bean>
+       <bean class="org.springframework.jms.connection.JmsTransactionManager" id="jmsTransactionManager">
+              <property name="connectionFactory" ref="connectionFactory"/>
+       </bean>
+       <bean class="org.apache.camel.spring.spi.SpringTransactionPolicy" id="transactionPolicy">
+              <property name="transactionManager" ref="jmsTransactionManager"/>
+              <property name="propagationBehaviorName" value="PROPAGATION_REQUIRED"/>
+       </bean>
+       <bean class="org.apache.camel.spring.spi.TransactionErrorHandlerBuilder" id="transactionErrorHandler">
+              <property name="deadLetterUri" value="activemq:queue:ActiveMQ.DLQ"/>
+              <property name="redeliveryPolicy" ref="redeliveryPolicy"/>
+       </bean>
+       <bean class="org.apache.camel.processor.RedeliveryPolicy" id="redeliveryPolicy">
+              <!--<property name="redeliveryDelay" value="1000"/>-->
+              <!--<property name="maximumRedeliveries" value="2"/>-->
+              <property name="backOffMultiplier" value="2"/>
+              <property name="useExponentialBackOff" value="true"/>
+       </bean>
+       <bean class="com.redhat.CustomException" id="exceptionBean">
+              <constructor-arg value="The route will fail now ...."/>
+       </bean>
+       <bean class="com.redhat.CustomProcessor" id="customProcessor"/>
+       <bean class="org.apache.activemq.RedeliveryPolicy" id="amqRedeliveryPolicy">
+              <property name="redeliveryDelay" value="100"/>
+              <property name="maximumRedeliveries" value="2"/>
+       </bean>
+</beans>
