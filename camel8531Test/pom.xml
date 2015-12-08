@@ -10,7 +10,7 @@
 				<groupId>org.jboss.fuse</groupId>
 				<artifactId>jboss-fuse</artifactId>
 				<type>pom</type>
-				<version>6.2.0.redhat-133</version>
+				<version>6.2.1.redhat-084</version>
 				<scope>import</scope>
 			</dependency>
 		</dependencies>
