@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:camel="http://camel.apache.org/schema/blueprint" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:jaxws="http://cxf.apache.org/blueprint/jaxws" xmlns:cxf="http://cxf.apache.org/blueprint/core"
+	xsi:schemaLocation="http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+		http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+		http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd
+		http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+		">
+
+	<cxf:bus>
+		<cxf:features>
+			<cxf:logging />
+		</cxf:features>
+	</cxf:bus>
+
+	<bean id="utSTSProviderBean"
+		class="org.apache.cxf.ws.security.sts.provider.SecurityTokenServiceProvider">
+		<property name="issueOperation" ref="utIssueDelegate" />
+		<property name="validateOperation" ref="utValidateDelegate" />
+	</bean>
+
+	<bean id="utIssueDelegate" class="org.apache.cxf.sts.operation.TokenIssueOperation">
+		<property name="tokenProviders">
+			<list>
+				<ref component-id="utSamlTokenProvider" />
+			</list>
+		</property>
+		<property name="services">
+			<list>
+				<ref component-id="utService" />
+			</list>
+		</property>
+		<property name="stsProperties" ref="utSTSProperties" />
+	</bean>
+
+	<bean id="utValidateDelegate" class="org.apache.cxf.sts.operation.TokenValidateOperation">
+		<property name="tokenValidators">
+			<list>
+				<ref component-id="utSamlTokenValidator" />
+			</list>
+		</property>
+		<property name="tokenProviders">
+			<list>
+				<ref component-id="utSamlTokenProvider" />
+			</list>
+		</property>
+		<property name="services">
+			<list>
+				<ref component-id="utService" />
+			</list>
+		</property>
+		<property name="stsProperties" ref="utSTSProperties" />
+	</bean>
+
+	<bean id="utSamlTokenProvider" class="org.apache.cxf.sts.token.provider.SAMLTokenProvider">
+	</bean>
+	<bean id="utSamlTokenValidator" class="org.apache.cxf.sts.token.validator.SAMLTokenValidator">
+	</bean>
+	<bean id="utService" class="org.apache.cxf.sts.service.StaticService">
+		<property name="endpoints">
+			<list>
+				<value>http://localhost:(\d)*/SoapContext/SoapPort</value>
+			</list>
+		</property>
+	</bean>
+	<!-- <util:list id="utEndpoints"> <value>http://localhost:(\d)*/SoapContext/SoapPort</value> 
+		</util:list> -->
+	<!-- <service ref="utEndpoints" auto-export="all-classes" /> -->
+
+	<bean id="utSTSProperties" class="org.apache.cxf.sts.StaticSTSProperties">
+		<property name="signaturePropertiesFile" value="stsKeystore.properties" />
+		<property name="signatureUsername" value="mystskey" />
+		<property name="callbackHandlerClass" value="com.redhat.sts.STSCallbackHandler" />
+		<property name="issuer" value="DoubleItSTSIssuer" />
+	</bean>
+	<jaxws:endpoint xmlns:ns1="http://docs.oasis-open.org/ws-sx/ws-trust/200512/"
+		id="UTSTS" implementor="#utSTSProviderBean" address="http://localhost:8080/SecurityTokenService/UT"
+		wsdlLocation="src/main/resources/wsdl/ws-trust-1.4-service.wsdl"
+		serviceName="ns1:SecurityTokenService" endpointName="ns1:UT_Port">
+		<jaxws:properties>
+			<entry key="ws-security.callback-handler" value="com.redhat.sts.STSCallbackHandler" />
+			<entry key="ws-security.signature.properties" value="stsKeystore.properties" />
+			<entry key="ws-security.signature.username" value="mystskey" />
+			<entry key="ws-security.enable.streaming" value="true" />
+		</jaxws:properties>
+	</jaxws:endpoint>
+
+	<camelContext xmlns="http://camel.apache.org/schema/blueprint"
+		trace="false">		
+	</camelContext>
+</blueprint>

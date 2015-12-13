@@ -1,0 +1,32 @@
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:camel="http://camel.apache.org/schema/blueprint"
+	xmlns:jaxws="http://cxf.apache.org/blueprint/jaxws" xmlns:cxf="http://cxf.apache.org/blueprint/core"
+	xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.0.0"
+	xsi:schemaLocation="
+       http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+       http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd
+       http://cxf.apache.org/blueprint/jaxws http://cxf.apache.org/schemas/blueprint/jaxws.xsd
+       http://cxf.apache.org/blueprint/core http://cxf.apache.org/schemas/blueprint/core.xsd">
+
+	<cxf:bus>
+		<cxf:features>
+			<cxf:logging />
+		</cxf:features>
+	</cxf:bus>
+
+	<jaxws:endpoint id="server"
+		address="http://localhost:9001/SoapContext/SoapPort" wsdlLocation="wsdl/hello_world.wsdl"
+		implementor="com.redhat.server.GreeterImpl">
+		<jaxws:properties>
+			<entry key="ws-security.signature.username" value="myservicekey" />
+			<entry key="ws-security.callback-handler" value="com.redhat.server.ServerCallbackHandler" />
+			<entry key="ws-security.signature.properties" value="serviceKeystore.properties" />
+			<entry key="ws-security.encryption.properties" value="serviceKeystore.properties" />
+			<entry key="ws-security.enable.streaming" value="true" />
+		</jaxws:properties>
+	</jaxws:endpoint>
+
+	<camelContext xmlns="http://camel.apache.org/schema/blueprint"
+		trace="false">		
+	</camelContext>
+</blueprint>
