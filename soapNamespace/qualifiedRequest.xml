@@ -1,0 +1,22 @@
+Actual Request :
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:bla="http://redhat.com/">
+<soap:Body>
+    <bla:sayHi xmlns:bla="http://redhat.com/">
+        <arg0 xmlns="http://redhat.com/">Viral</arg0>
+    </bla:sayHi>
+</soap:Body>
+</soap:Envelope>
+
+Expected Request :
+
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:bla="http://redhat.com/">
+<soap:Body>
+    <bla:sayHi>
+        <arg0 xmlns="http://redhat.com/">Viral</arg0>
+    </bla:sayHi>
+</soap:Body>
+</soap:Envelope>
+
+
+
