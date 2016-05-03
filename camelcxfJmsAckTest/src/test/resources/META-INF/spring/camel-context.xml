@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:cxf="http://camel.apache.org/schema/cxf"
+       xmlns:camel="http://camel.apache.org/schema/spring"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+         http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+        http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+    <cxf:cxfEndpoint id="jmsEndpoint"
+                     address="jms:jndi:dynamicQueues/testQueue?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=vm://localhost"
+                     serviceClass="com.redhat.GreetingService"
+                     endpointName="GreetingServicePort"
+                     serviceName="GreetingService" loggingFeatureEnabled="true">
+        <cxf:properties>
+            <entry key="dataFormat" value="RAW"/>
+        </cxf:properties>
+    </cxf:cxfEndpoint>
+
+    <camelContext xmlns="http://camel.apache.org/schema/spring">
+        <route>
+            <from uri="cxf:bean:jmsEndpoint"/>
+            <setExchangePattern pattern="InOnly"/>
+            <convertBodyTo type="java.lang.String"/>
+            <process ref="myProcessor"/>
+            <onException>
+                <exception>java.lang.Exception</exception>
+                <handled>
+                    <constant>false</constant>
+                </handled>
+                <to uri="activemq:queue:testQueue"/>
+            </onException>
+        </route>
+    </camelContext>
+
+    <bean class="org.apache.activemq.ActiveMQConnectionFactory" id="amqConnectionFactory" depends-on="broker">
+        <property name="brokerURL" value="vm://localhost"/>
+    </bean>
+    <bean id="broker" class="org.apache.activemq.xbean.BrokerFactoryBean">
+        <property name="config" value="classpath:activemq.xml"/>
+        <property name="start" value="true" />
+    </bean>
+    <bean class="com.redhat.DummyProcessor" id="myProcessor"/>
+    <bean class="org.apache.activemq.camel.component.ActiveMQComponent" id="activeMqComponent">
+        <property name="connectionFactory" ref="amqConnectionFactory"/>
+        <property name="acknowledgementMode" value="1"/>
+        <property name="acknowledgementModeName" value="CLIENT_ACKNOWLEDGE" />
+    </bean>
+</beans>

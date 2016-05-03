@@ -1,0 +1,122 @@
+package com.redhat;
+
+import org.apache.activemq.ActiveMQConnectionFactory;
+import org.apache.activemq.broker.BrokerService;
+import org.apache.activemq.pool.PooledConnectionFactory;
+import org.apache.camel.CamelContext;
+import org.apache.camel.Exchange;
+import org.apache.camel.ExchangePattern;
+import org.apache.camel.builder.RouteBuilder;
+import org.apache.camel.component.cxf.CxfComponent;
+import org.apache.camel.component.cxf.CxfEndpoint;
+import org.apache.camel.component.cxf.DataFormat;
+import org.apache.camel.component.jms.JmsEndpoint;
+import org.apache.camel.impl.DefaultExchange;
+import org.apache.camel.test.junit4.CamelTestSupport;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.jms.ConnectionFactory;
+import javax.jms.Session;
+
+/**
+ * Created by Viral Gohel
+ */
+public class TestJmsAck extends CamelTestSupport {
+    private static Logger logger= LoggerFactory.getLogger(TestJmsAck.class.getName());
+
+    private static final String REQUEST_MESSAGE = "<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+            + "<soap:Body><ns1:echo xmlns:ns1=\"http://redhat.com/\">"
+            + "<arg0 xmlns=\"http://redhat.com/\">Hello World!</arg0>"
+            + "</ns1:echo></soap:Body></soap:Envelope>";
+    private static final String REQUEST_PAYLOAD = "<ns1:echo xmlns:ns1=\"http://redhat.com/\">"
+            + "<arg0 xmlns=\"http://redhat.com/\">Hello World!</arg0></ns1:echo>";
+    private static final String TEST_MESSAGE = "Viral";
+    private static final String OPERATION_NAME="echo";
+
+
+    @BeforeClass
+    public static void startBroker() throws Exception{
+        BrokerService brokerService=new BrokerService();
+        brokerService.addConnector("tcp://localhost:61615");
+        brokerService.setBrokerName("myBroker");
+        logger.info("**** Broker is starting ...");
+        brokerService.start();
+        logger.info("*** Broker started now ..");
+    }
+
+    @BeforeClass
+    public static void prepareEndpoint() throws Exception{
+        String address = "jms:jndi:dynamicQueues/testQueue"
+                + "?jndiInitialContextFactory"
+                + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:61615";
+        GreetingService implementor = new GreetingServiceImpl();
+        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
+        svrFactory.setServiceClass(GreetingService.class);
+        svrFactory.setAddress(address);
+// And specify the transport ID with SOAP over JMS specification
+        svrFactory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID);
+        svrFactory.setServiceBean(implementor);
+        svrFactory.create();
+    }
+
+    @Override
+    protected RouteBuilder createRouteBuilder() throws Exception {
+        return new RouteBuilder() {
+            @Override
+            public void configure() throws Exception {
+                CamelContext camelContext=super.getContext();
+                camelContext.addComponent("cxf",getCxfEndpoint());
+                from("direct:start")
+                .convertBodyTo(String.class).to(getJmsEndpoint());
+            }
+        };
+    }
+
+    @Test
+    public void testService() throws Exception {
+        Exchange senderExchange = new DefaultExchange(context, ExchangePattern.InOut);
+        senderExchange.getIn().setBody(REQUEST_MESSAGE);
+        Exchange exchange = template.send("direct:start",senderExchange);
+
+        org.apache.camel.Message out = exchange.getOut();
+        String response = out.getBody(String.class);
+    }
+
+    private JmsEndpoint getJmsEndpoint() {
+        JmsEndpoint jmsEndpoint=new JmsEndpoint();
+        jmsEndpoint.setConnectionFactory(getConnectionFactory());
+        jmsEndpoint.setAcknowledgementMode(Session.CLIENT_ACKNOWLEDGE);
+        jmsEndpoint.setDestinationName("testQueue");
+        return jmsEndpoint;
+    }
+
+    private ConnectionFactory getConnectionFactory() {
+        ActiveMQConnectionFactory activeMQConnectionFactory=new ActiveMQConnectionFactory();
+        activeMQConnectionFactory.setBrokerURL("tcp://localhost:61615");
+        activeMQConnectionFactory.setUserName("admin");
+        activeMQConnectionFactory.setPassword("admin");
+
+        PooledConnectionFactory pooledConnectionFactory=new PooledConnectionFactory();
+        pooledConnectionFactory.setConnectionFactory(activeMQConnectionFactory);
+        return pooledConnectionFactory;
+    }
+
+    private CxfEndpoint getCxfEndpoint() throws Exception{
+        CxfComponent cxfComponent=new CxfComponent();
+        CxfEndpoint cxfEndpoint=new CxfEndpoint();
+        cxfEndpoint.setAddress("jms://");
+        cxfEndpoint.setServiceClass(GreetingService.class);
+        cxfEndpoint.setDataFormat(DataFormat.RAW);
+        cxfEndpoint.setLoggingFeatureEnabled(true);
+        cxfComponent.createEndpoint("cxf:bean:jmsEndpoint");
+        return cxfEndpoint;
+    }
+
+
+}
