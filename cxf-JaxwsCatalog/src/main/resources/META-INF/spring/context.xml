@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:camel="http://camel.apache.org/schema/spring" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:cxf="http://camel.apache.org/schema/cxf"
+	xsi:schemaLocation="http://cxf.apache.org/transports/camel http://cxf.apache.org/transports/camel.xsd
+		http://camel.apache.org/schema/cxf http://camel.apache.org/schema/cxf/camel-cxf.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+
+	<cxf:cxfEndpoint id="serviceEndpoint" address="http://localhost:9001/relativeAdd"
+		serviceClass="com.redhat.samples.ws.GreetingServiceImpl"></cxf:cxfEndpoint>
+	<camelContext xmlns="http://camel.apache.org/schema/spring"
+		trace="false">
+		<route>
+			<camel:from uri="cxf:bean:serviceEndpoint" />
+			<camel:log message="Message is : ${body}"></camel:log>
+		</route>
+	</camelContext>
+
+</beans>
