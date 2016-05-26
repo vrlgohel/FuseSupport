@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="http://ws.samples.redhat.com/types" version="1.0" xmlns:types="http://ws.samples.redhat.com/types"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:include schemaLocation="schema.xsd"/>
+
+  <xs:element name="goodbye" type="types:goodbye" />
+  <xs:element name="goodbyeResponse" type="types:goodbyeResponse" />
+  <xs:element name="hello" type="types:hello" />
+  <xs:element name="helloResponse" type="types:helloResponse" />
+  <xs:complexType name="goodbye">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="name" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="goodbyeResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="hello">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="name" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="helloResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="return" type="xs:string" />
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="http://mySite.com/greeting.xsd" uri="greeting.xsd" />
+</catalog>
+
+
+<!--<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+  <system systemId="UserService.wsdl" uri="META-INF/wsdl/UserService.wsdl"/>
+  <rewriteSystem systemIdStartString="http://mysite.com/samples/UserService.xsd" rewritePrefix="/schema/xsd/UserService.xsd"/>
+</catalog>-->
+
+
