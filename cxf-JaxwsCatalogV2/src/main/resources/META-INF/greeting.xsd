@@ -2,7 +2,7 @@
 <xs:schema targetNamespace="http://ws.samples.redhat.com/types" version="1.0" xmlns:types="http://ws.samples.redhat.com/types"
   xmlns:xs="http://www.w3.org/2001/XMLSchema">
 
-  <xs:include schemaLocation="schema.xsd"/>
+  <xs:include schemaLocation="http://myServer.com/schema.xsd"/>
 
   <xs:element name="goodbye" type="types:goodbye" />
   <xs:element name="goodbyeResponse" type="types:goodbyeResponse" />
