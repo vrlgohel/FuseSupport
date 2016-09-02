@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd
+        http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
+        http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+
+	<bean class="org.apache.activemq.ActiveMQConnectionFactory" id="jmsConnectionFactory">
+		<property name="brokerURL" value="tcp://localhost:61616"></property>
+		<property name="password" value="admin"/>
+		<property name="userName" value="admin"/>
+	</bean>
+	<bean id="jmsConfig" class="org.apache.cxf.transport.jms.JMSConfiguration"
+		p:connectionFactory-ref="jmsConnectionFactory" p:targetDestination="requestQueue" p:replyDestination="replyQueue"/>
+
+	<jaxws:client id="customerService" address="jms://"
+		serviceClass="com.example.customerservice.CustomerService">
+		<jaxws:features>
+			<bean class="org.apache.cxf.feature.LoggingFeature" />
+			<bean class="org.apache.cxf.transport.jms.JMSConfigFeature"
+				p:jmsConfig-ref="jmsConfig" />
+		</jaxws:features>
+	</jaxws:client>
+
+	<bean id="tester" class="com.redhat.client.CustomerServiceTester">
+		<property name="customerService" ref="customerService"></property>
+	</bean>
+</beans>

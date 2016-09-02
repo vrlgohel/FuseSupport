@@ -1,0 +1,7 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <getCustomersByName xmlns="http://customerservice.example.com/">
+            <name>Smith</name>
+        </getCustomersByName>
+    </soap:Body>
+</soap:Envelope>
