@@ -39,7 +39,8 @@
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>exec-maven-plugin</artifactId>
-				<version>1.4.0</version>
+				<version>1.2.1.jbossorg-3</version>
+				<extensions>true</extensions>
 				<executions>
 					<execution>
 						<goals>
