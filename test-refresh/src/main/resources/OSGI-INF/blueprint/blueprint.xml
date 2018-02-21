@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:camel="http://camel.apache.org/schema/blueprint"
+           xmlns:cm="http://aries.apache.org/blueprint/xmlns/blueprint-cm/v1.1.0"
+           xmlns:ext="http://aries.apache.org/blueprint/xmlns/blueprint-ext/v1.0.0"
+           xsi:schemaLocation="
+       http://www.osgi.org/xmlns/blueprint/v1.0.0 http://www.osgi.org/xmlns/blueprint/v1.0.0/blueprint.xsd
+       http://camel.apache.org/schema/blueprint http://camel.apache.org/schema/blueprint/camel-blueprint.xsd">
+
+    <cm:property-placeholder persistent-id="test" update-strategy="reload" />
+
+    <bean class="com.redhat.MessageProcessor" id="messageProcessor">
+        <argument value="profile:test.properties"/>
+    </bean>
+
+
+    <camelContext trace="false" xmlns="http://camel.apache.org/schema/blueprint">
+        <route>
+           <from uri="timer://foo?period=5s"/>
+            <process ref="messageProcessor"/>
+        </route>
+    </camelContext>
+
+    <reference id="resolverRef" interface="org.osgi.service.url.URLStreamHandlerService" filter="url.handler.protocol=profile" availability="mandatory"/>
+
+</blueprint>
